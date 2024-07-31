@@ -1,6 +1,6 @@
 import flet as ft
+from database import add_materia, get_all_materias, update_materia, delete_materia, add_nota, get_notas_by_materia
 from paginas.home import HomeView
-from paginas.home import materias  # Importe a lista materias de home.py
 
 def MateriasView(page: ft.Page):
     nome_materia_input = ft.TextField(label="Nome da Matéria")
@@ -9,7 +9,7 @@ def MateriasView(page: ft.Page):
 
     notas = []  # Lista para armazenar as notas e seus respectivos pesos
 
-    def add_nota(e):
+    def add_nota_view(e):
         try:
             nota = float(nota_input.value)
             peso = float(peso_input.value)
@@ -48,12 +48,7 @@ def MateriasView(page: ft.Page):
         soma_ponderada = sum(nota * peso for nota, peso in notas)
         soma_pesos = sum(peso for nota, peso in notas)
         nota_necessaria = calcular_nota_necessaria(media_minima, soma_pesos, soma_ponderada)
-        materias.append({
-            "nome": nome_materia_input.value,
-            "media": media_atual,
-            "media_minima": media_minima,
-            "nota_necessaria": nota_necessaria
-        })
+        add_materia(nome_materia_input.value, media_minima, media_atual, nota_necessaria)
         nome_materia_input.value = ""
         media_input.value = ""
         notas.clear()
@@ -79,7 +74,7 @@ def MateriasView(page: ft.Page):
                         media_input,
                         nota_input,
                         peso_input,
-                        ft.ElevatedButton("Adicionar Nota", on_click=add_nota),
+                        ft.ElevatedButton("Adicionar Nota", on_click=add_nota_view),
                         ft.ElevatedButton("Salvar Matéria", on_click=save_materia),
                         notas_list
                     ],

@@ -1,17 +1,17 @@
 import flet as ft
-
-materias = []
+from database import get_all_materias
 
 def HomeView(page: ft.Page):
     def update_materias_list():
         materias_list.controls.clear()
+        materias = get_all_materias()
         for materia in materias:
-            media_minima = materia["media_minima"]
-            media_atual = materia["media"]
-            nota_necessaria = materia["nota_necessaria"]
+            media_minima = materia[2]
+            media_atual = materia[3]
+            nota_necessaria = materia[4]
             materia_card = ft.Container(
                 content=ft.Column([
-                    ft.Text(f"Nome: {materia['nome']}", size=18),
+                    ft.Text(f"Nome: {materia[1]}", size=18),
                     ft.Text(f"Média Atual: {media_atual:.2f}", size=16),
                     ft.Text(f"Média Mínima: {media_minima:.2f}", size=16),
                     ft.Text(f"Nota Necessária (de acordo com os pesos restantes): {nota_necessaria:.2f}", size=16)
