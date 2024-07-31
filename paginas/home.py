@@ -3,22 +3,28 @@ import flet as ft
 materias = []
 
 def HomeView(page: ft.Page):
-    def add_materia(e):
-        materia_input = materia_input_field.value
-        if materia_input:
-            materias.append({"nome": materia_input, "notas": [], "media": 0})
-            materia_input_field.value = ""
-            update_materias_list()
-            page.update()
-
     def update_materias_list():
         materias_list.controls.clear()
         for materia in materias:
-            materias_list.controls.append(ft.Text(f"{materia['nome']} - Média: {materia['media']:.2f}"))
-        materias_list.controls.append(ft.ElevatedButton("Adicionar Matéria", on_click=add_materia))
+            media_minima = materia["media_minima"]
+            media_atual = materia["media"]
+            nota_necessaria = materia["nota_necessaria"]
+            materia_card = ft.Container(
+                content=ft.Column([
+                    ft.Text(f"Nome: {materia['nome']}", size=18),
+                    ft.Text(f"Média Atual: {media_atual:.2f}", size=16),
+                    ft.Text(f"Média Mínima: {media_minima:.2f}", size=16),
+                    ft.Text(f"Nota Necessária (de acordo com os pesos restantes): {nota_necessaria:.2f}", size=16)
+                ], spacing=5),
+                padding=10,
+                border_radius=10,
+                bgcolor="#E3F2FD"
+            )
+            materias_list.controls.append(materia_card)
+        page.update()
 
-    materia_input_field = ft.TextField(label="Adicionar Matéria")
     materias_list = ft.ListView(controls=[], height=400, spacing=10)
+    update_materias_list()  # Atualiza a lista de matérias ao carregar a página
 
     return ft.View(
         "/home",
@@ -33,13 +39,9 @@ def HomeView(page: ft.Page):
                 ),
                 content=ft.Column(
                     controls=[
-                        ft.Text(
-                            "Matérias",
-                            style=ft.TextThemeStyle.HEADLINE_MEDIUM
-                        ),
-                        materia_input_field,
-                        ft.ElevatedButton("Adicionar Matéria", on_click=add_materia),
-                        materias_list
+                        ft.Text("Matérias", style=ft.TextThemeStyle.HEADLINE_MEDIUM),
+                        materias_list,
+                        ft.ElevatedButton("Adicionar Matéria", on_click=lambda _: page.go("/materias")),
                     ],
                     alignment=ft.MainAxisAlignment.START,
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,

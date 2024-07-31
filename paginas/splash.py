@@ -26,7 +26,7 @@ def SplashView(page: ft.Page):
                         ),
                         ft.IconButton(
                             icon=ft.icons.ARROW_FORWARD,
-                            on_click=lambda _: page.go("/materias")
+                            on_click=lambda _: page.go("/home")
                         )
                     ],
                     alignment=ft.MainAxisAlignment.CENTER,
