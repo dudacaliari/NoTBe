@@ -1,5 +1,5 @@
 import flet as ft
-from database import add_materia, get_materia, update_materia, get_notas_by_materia, calcular_nota_necessaria
+from database import add_materia, get_materia, update_materia, get_notas_by_materia, add_nota, delete_notas_by_materia
 
 def MateriasView(page: ft.Page, materia_id=None):
     nome_materia_input = ft.TextField(label="Nome da Matéria")
@@ -48,8 +48,13 @@ def MateriasView(page: ft.Page, materia_id=None):
         nota_necessaria = calcular_nota_necessaria(media_minima, sum(peso for _, peso in notas), sum(nota * peso for nota, peso in notas))
         if materia_id:  # Atualiza matéria existente
             update_materia(materia_id, nome, media_minima, media_atual, nota_necessaria)
+            delete_notas_by_materia(materia_id)  # Deleta notas antigas
+            for nota, peso in notas:
+                add_nota(materia_id, nota, peso)  # Adiciona notas novamente
         else:  # Adiciona nova matéria
-            add_materia(nome, media_minima, media_atual, nota_necessaria)
+            add_materia_id = add_materia(nome, media_minima, media_atual, nota_necessaria)
+            for nota, peso in notas:
+                add_nota(add_materia_id, nota, peso)
         page.go("/home")
 
     def calcular_nota_necessaria(media_minima, soma_pesos, soma_ponderada):

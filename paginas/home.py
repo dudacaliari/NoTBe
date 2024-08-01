@@ -63,7 +63,7 @@ def HomeView(page: ft.Page):
                 alignment=ft.MainAxisAlignment.START,
                 spacing=10
             ),
-             ft.BottomAppBar(
+            ft.BottomAppBar(
                 content=ft.Row(
                     controls=[
                         ft.IconButton(icon=ft.icons.HOME, on_click=lambda _: page.go("/home")),
