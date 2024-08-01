@@ -22,9 +22,16 @@ def create_tables():
                 FOREIGN KEY (materia_id) REFERENCES materias (id) ON DELETE CASCADE
             )
         """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS eventos (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                data TEXT NOT NULL,
+                descricao TEXT NOT NULL
+            )
+        """)
     conn.close()
 
-# Adicionar nova matéria
+# Funções de Materias
 def add_materia(nome, media_minima, media_atual, nota_necessaria):
     conn = sqlite3.connect("notas.db")
     with conn:
@@ -37,7 +44,6 @@ def add_materia(nome, media_minima, media_atual, nota_necessaria):
     conn.close()
     return materia_id
 
-# Atualizar matéria existente
 def update_materia(id, nome, media_minima, media_atual, nota_necessaria):
     conn = sqlite3.connect("notas.db")
     with conn:
@@ -48,14 +54,12 @@ def update_materia(id, nome, media_minima, media_atual, nota_necessaria):
         """, (nome, media_minima, media_atual, nota_necessaria, id))
     conn.close()
 
-# Deletar matéria
 def delete_materia(id):
     conn = sqlite3.connect("notas.db")
     with conn:
         conn.execute("DELETE FROM materias WHERE id = ?", (id,))
     conn.close()
 
-# Obter todas as matérias
 def get_all_materias():
     conn = sqlite3.connect("notas.db")
     with conn:
@@ -65,7 +69,6 @@ def get_all_materias():
     conn.close()
     return materias
 
-# Obter uma matéria específica
 def get_materia(id):
     conn = sqlite3.connect("notas.db")
     with conn:
@@ -75,7 +78,6 @@ def get_materia(id):
     conn.close()
     return materia
 
-# Adicionar nota para uma matéria
 def add_nota(materia_id, nota, peso):
     conn = sqlite3.connect("notas.db")
     with conn:
@@ -85,7 +87,6 @@ def add_nota(materia_id, nota, peso):
         """, (materia_id, nota, peso))
     conn.close()
 
-# Obter notas por matéria
 def get_notas_by_materia(materia_id):
     conn = sqlite3.connect("notas.db")
     with conn:
@@ -95,9 +96,52 @@ def get_notas_by_materia(materia_id):
     conn.close()
     return notas
 
-# Deletar notas por matéria
 def delete_notas_by_materia(materia_id):
     conn = sqlite3.connect("notas.db")
     with conn:
         conn.execute("DELETE FROM notas WHERE materia_id = ?", (materia_id,))
     conn.close()
+
+# Funções de Eventos
+def add_evento(data, descricao):
+    conn = sqlite3.connect("notas.db")
+    with conn:
+        conn.execute("""
+            INSERT INTO eventos (data, descricao)
+            VALUES (?, ?)
+        """, (data, descricao))
+    conn.close()
+
+def update_evento(id, data, descricao):
+    conn = sqlite3.connect("notas.db")
+    with conn:
+        conn.execute("""
+            UPDATE eventos
+            SET data = ?, descricao = ?
+            WHERE id = ?
+        """, (data, descricao, id))
+    conn.close()
+
+def delete_evento(id):
+    conn = sqlite3.connect("notas.db")
+    with conn:
+        conn.execute("DELETE FROM eventos WHERE id = ?", (id,))
+    conn.close()
+
+def get_eventos_by_data(data):
+    conn = sqlite3.connect("notas.db")
+    with conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, descricao FROM eventos WHERE data = ?", (data,))
+        eventos = cursor.fetchall()
+    conn.close()
+    return eventos
+
+def get_all_eventos():
+    conn = sqlite3.connect("notas.db")
+    with conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT data, descricao FROM eventos ORDER BY data")
+        eventos = cursor.fetchall()
+    conn.close()
+    return eventos
