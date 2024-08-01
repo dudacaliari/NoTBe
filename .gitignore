@@ -1,2 +1,5 @@
 #Ignorando Pycache
 __pycache__/
+
+#Ignorando os dados do banco
+notas.db

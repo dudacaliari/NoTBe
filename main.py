@@ -2,7 +2,6 @@ import flet as ft
 from paginas.splash import SplashView
 from paginas.home import HomeView
 from paginas.materias import MateriasView
-from paginas.faltas import FaltasView
 from paginas.calendario import CalendarioView
 
 def main(page: ft.Page):
@@ -15,10 +14,10 @@ def main(page: ft.Page):
             page.views.append(SplashView(page))  # Tela de splash
         elif e.route == "/home":
             page.views.append(HomeView(page))  # Tela Home
-        elif e.route == "/materias":
-            page.views.append(MateriasView(page))  # Tela de adição de matérias
-        elif e.route == "/faltas":
-            page.views.append(FaltasView(page))  # Tela de registro de faltas
+        elif e.route.startswith("/materias"):
+            parts = e.route.split("/")
+            materia_id = int(parts[2]) if len(parts) > 2 else None
+            page.views.append(MateriasView(page, materia_id))  # Tela de adição/edição de matérias
         elif e.route == "/calendario":
             page.views.append(CalendarioView(page))  # Tela de calendário
         page.update()
@@ -27,7 +26,3 @@ def main(page: ft.Page):
     page.go("/")  # Inicia na tela de splash
 
 ft.app(target=main)
-
-
-
-
