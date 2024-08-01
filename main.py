@@ -3,8 +3,10 @@ from paginas.splash import SplashView
 from paginas.home import HomeView
 from paginas.materias import MateriasView
 from paginas.calendario import CalendarioView
+from database import create_tables
 
 def main(page: ft.Page):
+    create_tables()
     page.title = "NoTBe"
     page.vertical_alignment = ft.MainAxisAlignment.START
 
