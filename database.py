@@ -32,7 +32,7 @@ def create_tables():
         """)
     conn.close()
 
-# Adicionar nova matéria
+# Funções de Materias
 def add_materia(nome, media_minima, media_atual, nota_necessaria):
     conn = sqlite3.connect("notas.db")
     with conn:
@@ -45,7 +45,6 @@ def add_materia(nome, media_minima, media_atual, nota_necessaria):
     conn.close()
     return materia_id
 
-# Atualizar matéria existente
 def update_materia(id, nome, media_minima, media_atual, nota_necessaria):
     conn = sqlite3.connect("notas.db")
     with conn:
@@ -74,7 +73,6 @@ def delete_materia(id):
         conn.execute("DELETE FROM materias WHERE id = ?", (id,))
     conn.close()
 
-# Obter todas as matérias
 def get_all_materias():
     conn = sqlite3.connect("notas.db")
     with conn:
@@ -84,7 +82,6 @@ def get_all_materias():
     conn.close()
     return materias
 
-# Obter uma matéria específica
 def get_materia(id):
     conn = sqlite3.connect("notas.db")
     with conn:
@@ -94,7 +91,6 @@ def get_materia(id):
     conn.close()
     return materia
 
-# Adicionar nota para uma matéria
 def add_nota(materia_id, nota, peso):
     conn = sqlite3.connect("notas.db")
     with conn:
@@ -104,7 +100,6 @@ def add_nota(materia_id, nota, peso):
         """, (materia_id, nota, peso))
     conn.close()
 
-# Obter notas por matéria
 def get_notas_by_materia(materia_id):
     conn = sqlite3.connect("notas.db")
     with conn:
@@ -114,7 +109,6 @@ def get_notas_by_materia(materia_id):
     conn.close()
     return notas
 
-# Deletar notas por matéria
 def delete_notas_by_materia(materia_id):
     conn = sqlite3.connect("notas.db")
     with conn:
@@ -164,4 +158,3 @@ def get_all_eventos():
         eventos = cursor.fetchall()
     conn.close()
     return eventos
-
