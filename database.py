@@ -10,7 +10,8 @@ def create_tables():
                 nome TEXT NOT NULL,
                 media_minima REAL NOT NULL,
                 media_atual REAL NOT NULL,
-                nota_necessaria REAL NOT NULL
+                nota_necessaria REAL NOT NULL,
+                faltas INTEGER DEFAULT 0  -- Adiciona o campo faltas
             )
         """)
         conn.execute("""
@@ -37,8 +38,8 @@ def add_materia(nome, media_minima, media_atual, nota_necessaria):
     with conn:
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT INTO materias (nome, media_minima, media_atual, nota_necessaria)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO materias (nome, media_minima, media_atual, nota_necessaria, faltas)
+            VALUES (?, ?, ?, ?, 0)  -- Inicializa faltas com 0
         """, (nome, media_minima, media_atual, nota_necessaria))
         materia_id = cursor.lastrowid
     conn.close()
@@ -54,6 +55,18 @@ def update_materia(id, nome, media_minima, media_atual, nota_necessaria):
         """, (nome, media_minima, media_atual, nota_necessaria, id))
     conn.close()
 
+# Atualizar faltas de uma matéria
+def update_faltas(id, faltas):
+    conn = sqlite3.connect("notas.db")
+    with conn:
+        conn.execute("""
+            UPDATE materias
+            SET faltas = ?
+            WHERE id = ?
+        """, (faltas, id))
+    conn.close()
+
+# Deletar matéria
 def delete_materia(id):
     conn = sqlite3.connect("notas.db")
     with conn:
