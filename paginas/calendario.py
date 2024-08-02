@@ -1,5 +1,6 @@
 import datetime
 import flet as ft
+from database import add_evento, get_eventos_by_data, get_all_eventos, delete_evento, update_evento
 
 # Função que define a visualização do calendário
 def CalendarioView(page: ft.Page):
@@ -11,6 +12,14 @@ def CalendarioView(page: ft.Page):
     eventos = {}
     selected_date = None
 
+    # Função para carregar eventos do banco de dados
+    def load_eventos():
+        for data, descricao in get_all_eventos():
+            if data not in eventos:
+                eventos[data] = []
+            eventos[data].append(descricao)
+        update_proximos_eventos()
+
     # Função para lidar com a mudança de data
     def handle_change(e):
         nonlocal selected_date
@@ -20,15 +29,16 @@ def CalendarioView(page: ft.Page):
 
     # Função para lidar com o fechamento do DatePicker
     def handle_dismissal(e):
-        page.add(ft.Text(f"DatePicker dismissed"))
+        page.add(ft.Text("DatePicker dismissed"))
 
     # Função para adicionar um evento à data selecionada
-    def add_evento(e):
+    def add_evento_handler(e):
         if not selected_date:
             page.add(ft.Text("Por favor, selecione uma data."))
             return
         evento = evento_input.value
         if evento:
+            add_evento(selected_date, evento)
             if selected_date not in eventos:
                 eventos[selected_date] = []
             eventos[selected_date].append(evento)
@@ -66,11 +76,14 @@ def CalendarioView(page: ft.Page):
     # Função para confirmar a exclusão do evento
     def confirm_delete_event(date, event):
         def delete_event(e):
-            eventos[date].remove(event)
-            if not eventos[date]:
-                del eventos[date]
-            update_event_list()
-            update_proximos_eventos()
+            evento_id = next((id for id, desc in get_eventos_by_data(date) if desc == event), None)
+            if evento_id:
+                delete_evento(evento_id)
+                eventos[date].remove(event)
+                if not eventos[date]:
+                    del eventos[date]
+                update_event_list()
+                update_proximos_eventos()
             page.dialog.open = False
             page.update()
 
@@ -112,19 +125,22 @@ def CalendarioView(page: ft.Page):
     def save_event(old_date, old_event):
         new_event = event_edit_input.value
         new_date = event_edit_date_picker.value.strftime('%Y-%m-%d')
-        if new_date != old_date:
-            eventos[old_date].remove(old_event)
-            if not eventos[old_date]:
-                del eventos[old_date]
-            if new_date not in eventos:
-                eventos[new_date] = []
-            eventos[new_date].append(new_event)
-        else:
-            index = eventos[old_date].index(old_event)
-            eventos[old_date][index] = new_event
-        update_event_list()
-        update_proximos_eventos()
-        close_dialog()
+        evento_id = next((id for id, desc in get_eventos_by_data(old_date) if desc == old_event), None)
+        if evento_id:
+            update_evento(evento_id, new_date, new_event)
+            if new_date != old_date:
+                eventos[old_date].remove(old_event)
+                if not eventos[old_date]:
+                    del eventos[old_date]
+                if new_date not in eventos:
+                    eventos[new_date] = []
+                eventos[new_date].append(new_event)
+            else:
+                index = eventos[old_date].index(old_event)
+                eventos[old_date][index] = new_event
+            update_event_list()
+            update_proximos_eventos()
+            close_dialog()
 
     # Label para exibir a data selecionada
     selected_date_label = ft.Text("")
@@ -138,12 +154,15 @@ def CalendarioView(page: ft.Page):
     # Lista para exibir os próximos eventos
     proximos_eventos_list = ft.ListView(controls=[], height=200, spacing=10)
 
+    # Carrega os eventos do banco de dados ao iniciar a visualização
+    load_eventos()
+
     return ft.View(
         "/calendario",
         [
             ft.Container(
-                width=page.window_width,
-                height=page.window_height,
+                width=page.window.width,
+                height=page.window.height,
                 gradient=ft.LinearGradient(
                     colors=["#F5F5F5", "#ffffff"],
                     begin=ft.Alignment(-1, -1),
@@ -169,7 +188,7 @@ def CalendarioView(page: ft.Page):
                         ),
                         selected_date_label,
                         evento_input,
-                        ft.ElevatedButton("Adicionar Evento", on_click=add_evento),
+                        ft.ElevatedButton("Adicionar Evento", on_click=add_evento_handler),
                         ft.Text("Eventos do Dia Selecionado"),
                         eventos_list,
                         ft.Text("Próximos Eventos"),
@@ -184,7 +203,7 @@ def CalendarioView(page: ft.Page):
             ft.BottomAppBar(
                 content=ft.Row(
                     controls=[
-                        ft.IconButton(icon=ft.icons.HOME, on_click=lambda _: page.go("/")),
+                        ft.IconButton(icon=ft.icons.HOME, on_click=lambda _: page.go("/home")),
                         ft.IconButton(icon=ft.icons.BOOK, on_click=lambda _: page.go("/materias")),
                         ft.IconButton(icon=ft.icons.ALARM, on_click=lambda _: page.go("/faltas")),
                         ft.IconButton(icon=ft.icons.EVENT, on_click=lambda _: page.go("/calendario"))
