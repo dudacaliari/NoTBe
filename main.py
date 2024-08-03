@@ -11,7 +11,12 @@ def splashScreen(page: ft.Page):
     page.title = "NoTBe"
     page.update()
 
-    progress_bar = ft.ProgressBar(width=200)
+    # Adicionar a imagem GIF
+    gif_image = ft.Image(
+        src="assets/beaver.gif",  # Certifique-se de que o GIF está na pasta assets
+        width=500,
+        height=500
+    )
 
     splash_content = ft.Container(
         width=page.window.width,
@@ -21,32 +26,40 @@ def splashScreen(page: ft.Page):
             begin=ft.Alignment(-1, -1),
             end=ft.Alignment(1, 1)
         ),
-        content=ft.Column(
+        content=ft.ResponsiveRow(
             controls=[
-                ft.Text(
-                    "NoTBe",
-                    style=ft.TextThemeStyle.HEADLINE_LARGE,
-                    color=ft.colors.WHITE
-                ),
-                ft.Text(
-                    "Note Tracker Beaver",
-                    style=ft.TextThemeStyle.TITLE_MEDIUM,
-                    color=ft.colors.WHITE
-                ),
-                progress_bar
+                ft.Column(
+                    controls=[
+                        ft.Text(
+                            "NoTBe",
+                            style=ft.TextThemeStyle.HEADLINE_LARGE,
+                            color=ft.colors.WHITE
+                        ),
+                        ft.Text(
+                            "Note Tracker Beaver",
+                            style=ft.TextThemeStyle.TITLE_MEDIUM,
+                            color=ft.colors.WHITE
+                        ),
+                        ft.Container(
+                            content=gif_image,
+                            alignment=ft.alignment.center
+                        )
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    col={"xs": 12, "sm": 10, "md": 8, "lg": 6, "xl": 4},
+                    spacing=20
+                )
             ],
             alignment=ft.MainAxisAlignment.CENTER,
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            spacing=20
+            vertical_alignment=ft.CrossAxisAlignment.CENTER
         )
     )
 
     page.add(splash_content)
 
-    for i in range(100):
-        progress_bar.value = i / 100
-        page.update()
-        time.sleep(0.03)
+    # Simulação de carregamento
+    time.sleep(3)
 
     page.go("/home")
 
