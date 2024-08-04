@@ -2,14 +2,14 @@ import flet as ft
 from database import add_materia, get_materia, update_materia, get_notas_by_materia, add_nota, delete_notas_by_materia
 
 def MateriasView(page: ft.Page, materia_id=None):
-    nome_materia_input = ft.TextField(label="Nome da Matéria")
-    media_input = ft.TextField(label="Média Mínima")
+    nome_materia_input = ft.TextField(label="Nome da Matéria", bgcolor="#FFFFFF", border_color="#D7BDE2")
+    media_input = ft.TextField(label="Média Mínima", bgcolor="#FFFFFF", border_color="#D7BDE2")
     notas_list = ft.ListView(controls=[], height=200, spacing=10)
 
     notas = []  # Lista para armazenar as notas e seus respectivos pesos
 
-    nota_input = ft.TextField(label="Adicionar Nota")
-    peso_input = ft.TextField(label="Adicionar Peso")
+    nota_input = ft.TextField(label="Adicionar Nota", bgcolor="#FFFFFF", border_color="#D7BDE2")
+    peso_input = ft.TextField(label="Adicionar Peso", bgcolor="#FFFFFF", border_color="#D7BDE2")
 
     if materia_id:  # Se um ID de matéria for fornecido, preenche os campos
         materia = get_materia(materia_id)
@@ -19,7 +19,7 @@ def MateriasView(page: ft.Page, materia_id=None):
             # Carrega notas associadas à matéria
             notas = get_notas_by_materia(materia_id)
             for nota, peso in notas:
-                notas_list.controls.append(ft.Text(f"Nota: {nota}, Peso: {peso}"))
+                notas_list.controls.append(ft.Text(f"Nota: {nota}, Peso: {peso}", color="#FFFFFF", weight=ft.FontWeight.BOLD))
 
     def add_nota_view(e):
         try:
@@ -27,7 +27,7 @@ def MateriasView(page: ft.Page, materia_id=None):
             peso = float(peso_input.value)
             if nota is not None and peso is not None:  # Permite adicionar 0
                 notas.append((nota, peso))
-                notas_list.controls.append(ft.Text(f"Nota: {nota}, Peso: {peso}"))
+                notas_list.controls.append(ft.Text(f"Nota: {nota}, Peso: {peso}", color="#45287a", weight=ft.FontWeight.BOLD))
                 nota_input.value = ""
                 peso_input.value = ""
                 page.update()
@@ -64,32 +64,73 @@ def MateriasView(page: ft.Page, materia_id=None):
         nota_necessaria = (media_minima * (soma_pesos + peso_restante) - soma_ponderada) / peso_restante
         return max(0.0, nota_necessaria)
 
-
     return ft.View(
         f"/materias/{materia_id}" if materia_id else "/materias",
         [
-            ft.Column(
-                controls=[
-                    nome_materia_input,
-                    media_input,
-                    ft.Row(
-                        controls=[
-                            nota_input,
-                            peso_input,
-                            ft.IconButton(icon=ft.icons.ADD, on_click=add_nota_view)
-                        ]
-                    ),
-                    ft.ElevatedButton("Salvar Matéria", on_click=salvar_materia),
-                    notas_list,
-                ],
-                alignment=ft.MainAxisAlignment.START,
-                spacing=10
+            ft.Container(
+                width=page.window.width,
+                height=page.window.height,
+                bgcolor="#FFFFFF", 
+                content=ft.Column(
+                    controls=[
+                        ft.Container(
+                            content=ft.Column(
+                                controls=[
+                                    nome_materia_input,
+                                    media_input,
+                                    ft.Row(
+                                        controls=[
+                                            ft.Container(
+                                                content=nota_input,
+                                                width=150,  # Ajusta a largura do campo
+                                                margin=ft.Margin(left=0, top=0, right=10, bottom=0)  # Ajusta a margem
+                                            ),
+                                            ft.Container(
+                                                content=peso_input,
+                                                width=150  # Ajusta a largura do campo
+                                            ),
+                                            ft.IconButton(
+                                                icon=ft.icons.ADD, 
+                                                on_click=add_nota_view,
+                                                bgcolor="#D7BDE2",
+                                                width=50,
+                                                height=50
+                                            )
+                                        ],
+                                        alignment=ft.MainAxisAlignment.START,
+                                        spacing=10
+                                    ),
+                                    ft.ElevatedButton("Salvar Matéria", on_click=salvar_materia, bgcolor="#D7BDE2"),
+                                    notas_list,
+                                ],
+                                alignment=ft.MainAxisAlignment.START,
+                                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                spacing=20,
+                                expand=True
+                            ),
+                            padding=20,
+                            bgcolor="#D7BDE2",  # Cor lilás clara
+                            gradient=ft.LinearGradient(
+                                colors=["#885D9A", "#4B83A7"],
+                                begin=ft.Alignment(-1, -1),
+                                end=ft.Alignment(1, 1)
+                            ),
+                            border_radius=12,
+                            width=page.window.width,
+                            height=page.window.height * 0.8  # Ajusta a altura para o restante da tela
+                        )
+                    ],
+                    alignment=ft.MainAxisAlignment.START,
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    spacing=20,
+                    expand=True
+                ),
+                padding=20
             ),
-             ft.BottomAppBar(
+            ft.BottomAppBar(
                 content=ft.Row(
                     controls=[
                         ft.IconButton(icon=ft.icons.HOME, on_click=lambda _: page.go("/home")),
-                        ft.IconButton(icon=ft.icons.BOOK, on_click=lambda _: page.go("/materias")),
                         ft.IconButton(icon=ft.icons.ALARM, on_click=lambda _: page.go("/faltas")),
                         ft.IconButton(icon=ft.icons.EVENT, on_click=lambda _: page.go("/calendario"))
                     ],
