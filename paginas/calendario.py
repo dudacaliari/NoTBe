@@ -5,9 +5,12 @@ from database import add_evento, get_eventos_by_data, get_all_eventos, delete_ev
 # Função que define a visualização do calendário
 def CalendarioView(page: ft.Page):
     # Campo de entrada para adicionar eventos
-    evento_input = ft.TextField(label="Adicionar Evento")
+    evento_input = ft.TextField(
+        label="Adicionar Evento",
+        bgcolor="#FFFFFF"  # Cor de fundo branca
+    )
     # Lista para exibir todos os eventos
-    eventos_list = ft.ListView(controls=[], height=400, spacing=10)
+    proximos_eventos_list = ft.ListView(controls=[], spacing=10, expand=True)
     # Dicionário para armazenar eventos por data
     eventos = {}
     selected_date = None
@@ -25,7 +28,8 @@ def CalendarioView(page: ft.Page):
         nonlocal selected_date
         selected_date = e.control.value.strftime('%Y-%m-%d')
         selected_date_label.value = f"Data Selecionada: {selected_date}"
-        update_event_list()
+        update_proximos_eventos()
+        page.update()
 
     # Função para lidar com o fechamento do DatePicker
     def handle_dismissal(e):
@@ -42,35 +46,44 @@ def CalendarioView(page: ft.Page):
             if selected_date not in eventos:
                 eventos[selected_date] = []
             eventos[selected_date].append(evento)
-            update_event_list()
             update_proximos_eventos()
             evento_input.value = ""
             page.update()
 
-    # Função para atualizar a lista de eventos para a data selecionada
-    def update_event_list():
-        eventos_list.controls.clear()
-        if selected_date and selected_date in eventos:
-            for evento in eventos[selected_date]:
-                eventos_list.controls.append(create_event_row(selected_date, evento))
-        page.update()
-
     # Função para atualizar a lista de próximos eventos
     def update_proximos_eventos():
         proximos_eventos_list.controls.clear()
-        for date, eventos_data in sorted(eventos.items()):
+        for date, eventos_data in sorted(eventos.items(), reverse=True):
             for evento in eventos_data:
-                proximos_eventos_list.controls.append(ft.Text(f"{date}: {evento}"))
+                proximos_eventos_list.controls.append(create_event_row(date, evento))
         page.update()
 
     # Função para criar uma linha para cada evento com opções de editar e excluir
     def create_event_row(date, event):
-        return ft.Row(
-            controls=[
-                ft.Text(f"{date}: {event}"),
-                ft.IconButton(icon=ft.icons.EDIT, on_click=lambda e: edit_event(date, event)),
-                ft.IconButton(icon=ft.icons.DELETE, on_click=lambda e: confirm_delete_event(date, event))
-            ]
+        return ft.Container(
+            content=ft.Row(
+                controls=[
+                    ft.Text(f"{date}: {event}", color="#45287a", weight=ft.FontWeight.BOLD),
+                    ft.Row(
+                        controls=[
+                            ft.IconButton(icon=ft.icons.EDIT, on_click=lambda e: edit_event(date, event)),
+                            ft.IconButton(icon=ft.icons.DELETE, on_click=lambda e: confirm_delete_event(date, event))
+                        ],
+                        alignment=ft.MainAxisAlignment.END
+                    )
+                ],
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                vertical_alignment=ft.CrossAxisAlignment.CENTER
+            ),
+            padding=10,
+            bgcolor="#E8DAEF",  # Cor lilás claro
+            border=ft.Border(
+                left=ft.BorderSide(color="#A569BD", width=1),
+                right=ft.BorderSide(color="#A569BD", width=1),
+                top=ft.BorderSide(color="#A569BD", width=1),
+                bottom=ft.BorderSide(color="#A569BD", width=1)
+            ),
+            border_radius=8
         )
 
     # Função para confirmar a exclusão do evento
@@ -82,14 +95,13 @@ def CalendarioView(page: ft.Page):
                 eventos[date].remove(event)
                 if not eventos[date]:
                     del eventos[date]
-                update_event_list()
                 update_proximos_eventos()
             page.dialog.open = False
             page.update()
 
         page.dialog = ft.AlertDialog(
-            title=ft.Text("Confirmar Exclusão"),
-            content=ft.Text(f"Tem certeza que deseja excluir o evento '{event}'?"),
+            title=ft.Text("Confirmar Exclusão", color="#45287a", weight=ft.FontWeight.BOLD),
+            content=ft.Text(f"Tem certeza que deseja excluir o evento '{event}'?", color="#45287a"),
             actions=[
                 ft.TextButton("Cancelar", on_click=lambda e: close_dialog()),
                 ft.TextButton("Excluir", on_click=delete_event)
@@ -108,7 +120,7 @@ def CalendarioView(page: ft.Page):
         event_edit_input.value = event
         event_edit_date_picker.value = datetime.datetime.strptime(date, '%Y-%m-%d')
         page.dialog = ft.AlertDialog(
-            title=ft.Text("Editar Evento"),
+            title=ft.Text("Editar Evento", color="#45287a", weight=ft.FontWeight.BOLD),
             content=ft.Column([
                 event_edit_input,
                 event_edit_date_picker
@@ -138,21 +150,21 @@ def CalendarioView(page: ft.Page):
             else:
                 index = eventos[old_date].index(old_event)
                 eventos[old_date][index] = new_event
-            update_event_list()
             update_proximos_eventos()
             close_dialog()
 
     # Label para exibir a data selecionada
-    selected_date_label = ft.Text("")
+    selected_date_label = ft.Text("", color="#FFFFFF", weight=ft.FontWeight.BOLD)
     # Campo de entrada para editar eventos
-    event_edit_input = ft.TextField(label="Editar Evento")
+    event_edit_input = ft.TextField(
+        label="Editar Evento",
+        bgcolor="#FFFFFF"  # Cor de fundo branca
+    )
     # DatePicker para editar a data do evento
     event_edit_date_picker = ft.DatePicker(
         first_date=datetime.datetime(year=2023, month=10, day=1),
         last_date=datetime.datetime(year=2024, month=10, day=1)
     )
-    # Lista para exibir os próximos eventos
-    proximos_eventos_list = ft.ListView(controls=[], height=200, spacing=10)
 
     # Carrega os eventos do banco de dados ao iniciar a visualização
     load_eventos()
@@ -163,40 +175,82 @@ def CalendarioView(page: ft.Page):
             ft.Container(
                 width=page.window.width,
                 height=page.window.height,
-                gradient=ft.LinearGradient(
-                    colors=["#F5F5F5", "#ffffff"],
-                    begin=ft.Alignment(-1, -1),
-                    end=ft.Alignment(1, 1)
-                ),
+                bgcolor="#FFFFFF",  # Fundo branco
                 content=ft.Column(
                     controls=[
-                        ft.Text(
-                            "Calendário",
-                            style=ft.TextThemeStyle.HEADLINE_MEDIUM
-                        ),
-                        ft.ElevatedButton(
-                            "Escolher Data",
-                            icon=ft.icons.CALENDAR_MONTH,
-                            on_click=lambda e: page.open(
-                                ft.DatePicker(
-                                    first_date=datetime.datetime(year=2023, month=10, day=1),
-                                    last_date=datetime.datetime(year=2024, month=10, day=1),
-                                    on_change=handle_change,
-                                    on_dismiss=handle_dismissal,
-                                )
-                            ),
-                        ),
-                        selected_date_label,
-                        evento_input,
-                        ft.ElevatedButton("Adicionar Evento", on_click=add_evento_handler),
-                        ft.Text("Eventos do Dia Selecionado"),
-                        eventos_list,
-                        ft.Text("Próximos Eventos"),
-                        proximos_eventos_list
+                        # Container com o fundo degradê
+                        ft.Container(
+                            content=ft.Column(
+                                controls=[
+                                    # Barra com degradê e os elementos dentro
+                                    ft.Container(
+                                        content=ft.Column(
+                                            controls=[
+                                                ft.Text(
+                                                    "Calendário",
+                                                    style=ft.TextStyle(
+                                                        size=24,  # Ajuste o tamanho conforme necessário
+                                                        weight=ft.FontWeight.BOLD,  # Ajuste o peso da fonte
+                                                        color=ft.colors.WHITE  # Ajuste a cor conforme necessário
+                                                    )
+                                                ),
+                                                ft.ElevatedButton(
+                                                    "Escolher Data",
+                                                    icon=ft.icons.CALENDAR_MONTH,
+                                                    on_click=lambda e: page.open(
+                                                        ft.DatePicker(
+                                                            first_date=datetime.datetime(year=2023, month=10, day=1),
+                                                            last_date=datetime.datetime(year=2024, month=10, day=1),
+                                                            on_change=handle_change,
+                                                            on_dismiss=handle_dismissal,
+                                                        )
+                                                    ),
+                                                    bgcolor="#FFFFFF"  # Cor de fundo
+                                                ),
+                                                selected_date_label,  # Adiciona a data selecionada aqui
+                                                evento_input,
+                                                ft.ElevatedButton(
+                                                    "Adicionar Evento",
+                                                    on_click=add_evento_handler,
+                                                    bgcolor="#FFFFFF"  # Cor de fundo
+                                                )
+                                            ],
+                                            alignment=ft.MainAxisAlignment.START,
+                                            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                            spacing=20
+                                        ),
+                                        padding=20,
+                                        bgcolor="#D7BDE2",  # Cor lilás clara
+                                        gradient=ft.LinearGradient(
+                                            colors=["#885D9A", "#4B83A7"],
+                                            begin=ft.Alignment(-1, -1),
+                                            end=ft.Alignment(1, 1)
+                                        ),
+                                        border_radius=12,
+                                    ),
+                                    # Container para a lista de próximos eventos
+                                    ft.Container(
+                                        height=page.window.height * 0.5,  # Proporcional ao tamanho da página
+                                        content=ft.Column([
+                                            ft.Text("Próximos Eventos: ", color="#45287a", weight=ft.FontWeight.BOLD),
+                                            proximos_eventos_list
+                                        ], expand=True),
+                                        padding=10,
+                                        bgcolor="#D7BDE2",  # Cor lilás clara
+                                        border_radius=12  # Bordas arredondadas
+                                    )
+                                ],
+                                alignment=ft.MainAxisAlignment.START,
+                                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                spacing=20,
+                                expand=True  # Permite a expansão vertical
+                            )
+                        )
                     ],
                     alignment=ft.MainAxisAlignment.START,
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    spacing=20
+                    spacing=20,
+                    expand=True  # Permite a expansão vertical
                 ),
                 padding=20
             ),
@@ -204,7 +258,6 @@ def CalendarioView(page: ft.Page):
                 content=ft.Row(
                     controls=[
                         ft.IconButton(icon=ft.icons.HOME, on_click=lambda _: page.go("/home")),
-                        ft.IconButton(icon=ft.icons.BOOK, on_click=lambda _: page.go("/materias")),
                         ft.IconButton(icon=ft.icons.ALARM, on_click=lambda _: page.go("/faltas")),
                         ft.IconButton(icon=ft.icons.EVENT, on_click=lambda _: page.go("/calendario"))
                     ],

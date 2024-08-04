@@ -22,13 +22,19 @@ def FaltasView(page: ft.Page):
         for materia in materias:
             materia_id, nome, media_minima, media_atual, nota_necessaria, faltas = materia
             faltas_list.controls.append(
-                ft.Row(
-                    controls=[
-                        ft.Text(f"{nome}: {faltas} faltas"),
-                        ft.IconButton(icon=ft.icons.ADD, on_click=lambda e, id=materia_id, f=faltas: add_falta(e, id, f)),
-                        ft.IconButton(icon=ft.icons.REMOVE, on_click=lambda e, id=materia_id, f=faltas: remove_falta(e, id, f))
-                    ],
-                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                ft.Container(
+                    content=ft.Row(
+                        controls=[
+                            ft.Text(f"{nome}: {faltas} faltas", weight=ft.FontWeight.BOLD, color="#45287a"),
+                            ft.IconButton(icon=ft.icons.ADD, on_click=lambda e, id=materia_id, f=faltas: add_falta(e, id, f), bgcolor="#D7BDE2"),
+                            ft.IconButton(icon=ft.icons.REMOVE, on_click=lambda e, id=materia_id, f=faltas: remove_falta(e, id, f), bgcolor="#D7BDE2")
+                        ],
+                        alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                        spacing=10
+                    ),
+                    margin=ft.Margin(left=0, top=0, right=0, bottom=10),
+                    bgcolor="#F9F9F9",
+                    border_radius=8
                 )
             )
         page.update()
@@ -50,7 +56,8 @@ def FaltasView(page: ft.Page):
                     controls=[
                         ft.Text(
                             "Registro de Faltas",
-                            style=ft.TextThemeStyle.HEADLINE_MEDIUM
+                            style=ft.TextThemeStyle.HEADLINE_MEDIUM,
+                            color="#45287a"
                         ),
                         faltas_list
                     ],
@@ -64,7 +71,6 @@ def FaltasView(page: ft.Page):
                 content=ft.Row(
                     controls=[
                         ft.IconButton(icon=ft.icons.HOME, on_click=lambda _: page.go("/home")),
-                        ft.IconButton(icon=ft.icons.BOOK, on_click=lambda _: page.go("/materias")),
                         ft.IconButton(icon=ft.icons.ALARM, on_click=lambda _: page.go("/faltas")),
                         ft.IconButton(icon=ft.icons.EVENT, on_click=lambda _: page.go("/calendario"))
                     ],
