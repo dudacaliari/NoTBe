@@ -33,17 +33,28 @@ def HomeView(page: ft.Page):
             # Layout das informações
             materia_card = ft.Container(
                 content=ft.Column([
+                    ft.Row(
+                        controls=[
+                            ft.IconButton(
+                                icon=ft.icons.CLOSE, 
+                                on_click=lambda e, materia_id=materia[0]: confirm_delete_materia(materia_id)
+                            )
+                        ],
+                        alignment=ft.MainAxisAlignment.END,
+                        spacing=10
+                    ),
                     ft.Text(
                         f"{materia[1]}",
-                        size=18,
-                        color="#45287a",
-                        weight=ft.FontWeight.BOLD
+                        size=22,
+                        color="#9170B1",
+                        weight=ft.FontWeight.W_400
                     ),
+                    ft.Text(f"Média Mínima: {media_minima:.2f}", size=16, color="#45287a", weight=ft.FontWeight.BOLD),
                     ft.Row(
                         controls=[
                             ft.Column(
                                 controls=[
-                                    ft.Text("Média Atual:", size=16, color="#45287a"),
+                                    ft.Text("média atual", size=16, color="#707070"),
                                     create_circle(media_atual, media_atual_color)
                                 ],
                                 alignment=ft.MainAxisAlignment.CENTER,
@@ -52,7 +63,7 @@ def HomeView(page: ft.Page):
                             ),
                             ft.Column(
                                 controls=[
-                                    ft.Text("Nota Necessária:", size=16, color="#45287a"),
+                                    ft.Text("nota necessária", size=16, color="#707070"),
                                     create_circle(nota_necessaria, nota_necessaria_color)
                                 ],
                                 alignment=ft.MainAxisAlignment.CENTER,
@@ -63,22 +74,19 @@ def HomeView(page: ft.Page):
                         alignment=ft.MainAxisAlignment.CENTER,
                         spacing=20
                     ),
-                    # Texto "Média Mínima" acima das outras informações
-                    ft.Text(f"Média Mínima: {media_minima:.2f}", size=16, color="#45287a", weight=ft.FontWeight.BOLD),
                     ft.Row(
                         controls=[
-                            ft.IconButton(icon=ft.icons.DELETE, on_click=lambda e, materia_id=materia[0]: confirm_delete_materia(materia_id)),
                             ft.IconButton(icon=ft.icons.EDIT, on_click=lambda e, materia_id=materia[0]: edit_materia_view(materia_id))
                         ],
-                        alignment=ft.MainAxisAlignment.CENTER,
+                        alignment=ft.MainAxisAlignment.END,
                         spacing=10
-                    )
+                    ),
                 ]),
-                padding=10,
+                padding=20,
                 margin=10,
-                bgcolor="#FFFFFF",
+                bgcolor="#EBEBEB",
                 border_radius=12,
-                expand=True  # Permite que o container se expanda lateralmente
+                expand=True #Permite que o container se expanda lateralmente
             )
             materias_list.controls.append(materia_card)
             # Adiciona uma faixa lilás clara após cada matéria
@@ -126,22 +134,22 @@ def HomeView(page: ft.Page):
                             content=ft.Column(
                                 controls=[
                                     ft.Text(
-                                        "Matérias",
+                                        "Matérias Cadastradas",
                                         style=ft.TextStyle(
-                                            size=24,  # Ajuste o tamanho conforme necessário
-                                            weight=ft.FontWeight.BOLD,  # Ajuste o peso da fonte
+                                            size=30,  # Ajuste o tamanho conforme necessário
+                                            weight=ft.FontWeight.W_300,  # Ajuste o peso da fonte
                                             color=ft.colors.WHITE  # Ajuste a cor conforme necessário
                                         )
                                     ),
-                                    ft.ElevatedButton(
-                                        "Adicionar Matéria",
+                                    ft.IconButton(
                                         icon=ft.icons.ADD,
+                                        icon_color="#906BAB",
+                                        icon_size=20,
+                                        bgcolor="#F5F5F5",
                                         on_click=lambda e: page.go("/materias"),
-                                        bgcolor="#FFFFFF"  # Cor de fundo
                                     )
                                 ],
                                 alignment=ft.MainAxisAlignment.START,
-                                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                                 spacing=20,
                                 expand=True  # Permite a expansão vertical
                             ),
@@ -158,10 +166,10 @@ def HomeView(page: ft.Page):
                         ),
                         # Container com a lista de matérias
                         ft.Container(
-                            height=page.window.height * 0.6,  # Proporcional ao tamanho da página
+                            height=page.window.height * 0.8,  # Proporcional ao tamanho da página
                             content=materias_list,
                             padding=10,
-                            bgcolor="#D7BDE2",  # Fundo branco
+                            bgcolor="#FFFFFF",  # Fundo branco
                             border_radius=12,  # Bordas arredondadas
                             expand=True  # Permite que o container se expanda lateralmente
                         )
