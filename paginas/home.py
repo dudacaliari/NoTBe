@@ -92,8 +92,6 @@ def HomeView(page: ft.Page):
                 expand=True  # Permite que o container se expanda lateralmente
             )
             materias_list.controls.append(materia_card)
-            # Adiciona uma faixa lilás clara após cada matéria
-            materias_list.controls.append(ft.Container(height=2, bgcolor="#D7BDE2", expand=True))
         page.update()
 
     def edit_materia_view(materia_id):
@@ -179,7 +177,6 @@ def HomeView(page: ft.Page):
                                     ),
                                     # Container com a lista de matérias
                                     ft.Container(
-                                        height=page.window.height * 0.8,  # Proporcional ao tamanho da página
                                         content=materias_list,
                                         padding=10,
                                         border_radius=12,  # Bordas arredondadas
@@ -189,6 +186,7 @@ def HomeView(page: ft.Page):
                                 alignment=ft.MainAxisAlignment.START,
                                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                                 spacing=20,
+                                height=page.window.height * 0.8,
                                 expand=True  # Permite a expansão vertical
                             ),
                             padding=20,
@@ -200,13 +198,14 @@ def HomeView(page: ft.Page):
             ft.BottomAppBar(
                 content=ft.Row(
                     controls=[
-                        ft.IconButton(icon=ft.icons.HOME, on_click=lambda _: page.go("/home")),
-                        ft.IconButton(icon=ft.icons.ALARM, on_click=lambda _: page.go("/faltas")),
-                        ft.IconButton(icon=ft.icons.EVENT, on_click=lambda _: page.go("/calendario"))
+                        ft.IconButton(icon=ft.icons.ALARM, icon_color="#785494", on_click=lambda _: page.go("/faltas")),
+                        ft.IconButton(icon=ft.icons.HOME, icon_color="#5e4e69", bgcolor="#c5a4de", on_click=lambda _: page.go("/home")),
+                        ft.IconButton(icon=ft.icons.EVENT, icon_color="#785494", on_click=lambda _: page.go("/calendario"))
                     ],
                     alignment=ft.MainAxisAlignment.SPACE_AROUND
                 ),
-                padding=10
-             )
+                bgcolor="#dec5f0",  # Cor roxa com opacidade
+                padding=10,
+            )
         ]
     )

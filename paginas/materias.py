@@ -130,13 +130,14 @@ def MateriasView(page: ft.Page, materia_id=None):
             ft.BottomAppBar(
                 content=ft.Row(
                     controls=[
-                        ft.IconButton(icon=ft.icons.HOME, on_click=lambda _: page.go("/home")),
-                        ft.IconButton(icon=ft.icons.ALARM, on_click=lambda _: page.go("/faltas")),
-                        ft.IconButton(icon=ft.icons.EVENT, on_click=lambda _: page.go("/calendario"))
+                        ft.IconButton(icon=ft.icons.ALARM, icon_color="#785494", on_click=lambda _: page.go("/faltas")),
+                        ft.IconButton(icon=ft.icons.HOME, icon_color="#785494", on_click=lambda _: page.go("/home")),
+                        ft.IconButton(icon=ft.icons.EVENT, icon_color="#785494", on_click=lambda _: page.go("/calendario"))
                     ],
                     alignment=ft.MainAxisAlignment.SPACE_AROUND
                 ),
-                padding=10
-             )
+                bgcolor="#dec5f0",  # Cor roxa com opacidade
+                padding=10,
+            )
         ]
     )
