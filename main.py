@@ -13,9 +13,9 @@ def splashScreen(page: ft.Page):
 
     # Adicionar a imagem GIF
     gif_image = ft.Image(
-        src="assets/beaver.gif",  # Certifique-se de que o GIF está na pasta assets
-        width=500,
-        height=500
+        src="assets/LogoNB.gif",  # Certifique-se de que o GIF está na pasta assets
+        width=400,
+        height=400
     )
 
     splash_content = ft.Container(
@@ -30,16 +30,6 @@ def splashScreen(page: ft.Page):
             controls=[
                 ft.Column(
                     controls=[
-                        ft.Text(
-                            "NoTBe",
-                            style=ft.TextThemeStyle.HEADLINE_LARGE,
-                            color=ft.colors.WHITE
-                        ),
-                        ft.Text(
-                            "Note Tracker Beaver",
-                            style=ft.TextThemeStyle.TITLE_MEDIUM,
-                            color=ft.colors.WHITE
-                        ),
                         ft.Container(
                             content=gif_image,
                             alignment=ft.alignment.center
