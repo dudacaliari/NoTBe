@@ -1,4 +1,3 @@
-import datetime
 import flet as ft
 from database import get_all_materias, delete_materia
 
@@ -35,21 +34,21 @@ def HomeView(page: ft.Page):
                 content=ft.Column([
                     ft.Row(
                         controls=[
+                            ft.Text(
+                                f"{materia[1]}",
+                                size=22,
+                                color="#9170B1",
+                                weight=ft.FontWeight.W_400
+                            ),
                             ft.IconButton(
                                 icon=ft.icons.CLOSE, 
-                                on_click=lambda e, materia_id=materia[0]: confirm_delete_materia(materia_id)
+                                on_click=lambda e, materia_id=materia[0]: confirm_delete_materia(materia_id),
+                                icon_color="#AE93C1"
                             )
                         ],
-                        alignment=ft.MainAxisAlignment.END,
-                        spacing=10
+                        alignment=ft.MainAxisAlignment.SPACE_BETWEEN
                     ),
-                    ft.Text(
-                        f"{materia[1]}",
-                        size=22,
-                        color="#9170B1",
-                        weight=ft.FontWeight.W_400
-                    ),
-                    ft.Text(f"Média Mínima: {media_minima:.2f}", size=16, color="#45287a", weight=ft.FontWeight.BOLD),
+                    ft.Text(f"média mínima: {media_minima:.2f}", size=16, color="#9170B1"),
                     ft.Row(
                         controls=[
                             ft.Column(
@@ -76,7 +75,11 @@ def HomeView(page: ft.Page):
                     ),
                     ft.Row(
                         controls=[
-                            ft.IconButton(icon=ft.icons.EDIT, on_click=lambda e, materia_id=materia[0]: edit_materia_view(materia_id))
+                            ft.IconButton(
+                                icon=ft.icons.EDIT, on_click=lambda e, 
+                                materia_id=materia[0]: edit_materia_view(materia_id), 
+                                icon_color="#AE93C1"
+                            ),
                         ],
                         alignment=ft.MainAxisAlignment.END,
                         spacing=10
@@ -86,7 +89,7 @@ def HomeView(page: ft.Page):
                 margin=10,
                 bgcolor="#EBEBEB",
                 border_radius=12,
-                expand=True #Permite que o container se expanda lateralmente
+                expand=True  # Permite que o container se expanda lateralmente
             )
             materias_list.controls.append(materia_card)
             # Adiciona uma faixa lilás clara após cada matéria
@@ -128,58 +131,71 @@ def HomeView(page: ft.Page):
                 width=page.window.width,
                 height=page.window.height,
                 bgcolor="#FFFFFF", 
-                content=ft.Column(
+                content=ft.Stack(  # Usando Stack para sobrepor o conteúdo
                     controls=[
+                        # Meio círculo no fundo
                         ft.Container(
-                            content=ft.Column(
-                                controls=[
-                                    ft.Text(
-                                        "Matérias Cadastradas",
-                                        style=ft.TextStyle(
-                                            size=30,  # Ajuste o tamanho conforme necessário
-                                            weight=ft.FontWeight.W_300,  # Ajuste o peso da fonte
-                                            color=ft.colors.WHITE  # Ajuste a cor conforme necessário
-                                        )
-                                    ),
-                                    ft.IconButton(
-                                        icon=ft.icons.ADD,
-                                        icon_color="#906BAB",
-                                        icon_size=20,
-                                        bgcolor="#F5F5F5",
-                                        on_click=lambda e: page.go("/materias"),
-                                    )
-                                ],
-                                alignment=ft.MainAxisAlignment.START,
-                                spacing=20,
-                                expand=True  # Permite a expansão vertical
-                            ),
-                            padding=20,
+                            width=page.window.width,
+                            height=page.window.height * 0.4,  # Proporcional ao tamanho da página
                             bgcolor="#D7BDE2",  # Cor lilás clara
                             gradient=ft.LinearGradient(
                                 colors=["#885D9A", "#4B83A7"],
                                 begin=ft.Alignment(-1, -1),
                                 end=ft.Alignment(1, 1)
                             ),
-                            border_radius=12,
-                            width=page.window.width,
-                            height=page.window.height * 0.2  # Limita a altura a 20% da altura da janela
+                            border_radius=ft.BorderRadius(0, 0, 100, 100),  # Meio círculo
+                            alignment=ft.Alignment(-1, -1),  # Alinha ao topo
                         ),
-                        # Container com a lista de matérias
+                        # Conteúdo principal
                         ft.Container(
-                            height=page.window.height * 0.8,  # Proporcional ao tamanho da página
-                            content=materias_list,
-                            padding=10,
-                            bgcolor="#FFFFFF",  # Fundo branco
-                            border_radius=12,  # Bordas arredondadas
-                            expand=True  # Permite que o container se expanda lateralmente
-                        )
-                    ],
-                    alignment=ft.MainAxisAlignment.START,
-                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    spacing=20,
-                    expand=True  # Permite a expansão vertical
+                            content=ft.Column(
+                                controls=[
+                                    ft.Container(
+                                        content=ft.Column(
+                                            controls=[
+                                                ft.Text(
+                                                    "Matérias Cadastradas",
+                                                    style=ft.TextStyle(
+                                                        size=30,  # Ajuste o tamanho conforme necessário
+                                                        weight=ft.FontWeight.W_300,  # Ajuste o peso da fonte
+                                                        color=ft.colors.WHITE  # Ajuste a cor conforme necessário
+                                                    )
+                                                ),
+                                                ft.IconButton(
+                                                    icon=ft.icons.ADD,
+                                                    icon_color="#906BAB",
+                                                    icon_size=20,
+                                                    bgcolor="#F5F5F5",
+                                                    on_click=lambda e: page.go("/materias"),
+                                                )
+                                            ],
+                                            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,  # Alinha os itens com espaço entre eles
+                                            spacing=20,
+                                            expand=True  # Permite a expansão horizontal
+                                        ),
+                                        padding=20,
+                                        width=page.window.width,
+                                        height=page.window.height * 0.2,  # Limita a altura a 20% da altura da janela
+                                    ),
+                                    # Container com a lista de matérias
+                                    ft.Container(
+                                        height=page.window.height * 0.8,  # Proporcional ao tamanho da página
+                                        content=materias_list,
+                                        padding=10,
+                                        border_radius=12,  # Bordas arredondadas
+                                        expand=True  # Permite que o container se expanda lateralmente
+                                    )
+                                ],
+                                alignment=ft.MainAxisAlignment.START,
+                                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                spacing=20,
+                                expand=True  # Permite a expansão vertical
+                            ),
+                            padding=20,
+                            expand=True  # Permite a expansão vertical
+                        ),
+                    ]
                 ),
-                padding=20
             ),
             ft.BottomAppBar(
                 content=ft.Row(
