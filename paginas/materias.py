@@ -2,6 +2,7 @@ import flet as ft
 from database import add_materia, get_materia, update_materia, get_notas_by_materia, add_nota, delete_notas_by_materia
 
 def MateriasView(page: ft.Page, materia_id=None):
+    # Campos de entrada para nome da matéria e média mínima
     nome_materia_input = ft.TextField(
         label="Nome da Matéria", 
         bgcolor="#FFFFFF", 
@@ -16,20 +17,22 @@ def MateriasView(page: ft.Page, materia_id=None):
         label_style=ft.TextStyle(color="#8F8F8F"),
         color="#8F8F8F"
     )
+
+    # Lista para exibir notas
     notas_list = ft.ListView(
         controls=[], 
         spacing=10,
     )
-
     notas_container = ft.Container(
         content=notas_list,
-        height=200,  # Define uma altura fixa para o container das notas
+        height=200,  # Altura fixa para o container de notas
         width=300,
         padding=10
     )
 
     notas = []  # Lista para armazenar as notas e seus respectivos pesos
 
+    # Campos de entrada para notas e pesos
     nota_input = ft.TextField(
         label="Nota",
         bgcolor="#FFFFFF", 
@@ -47,7 +50,8 @@ def MateriasView(page: ft.Page, materia_id=None):
         color="#8F8F8F"
     )
 
-    if materia_id:  # Se um ID de matéria for fornecido, preenche os campos
+    # Se um ID de matéria for fornecido, preenche os campos com informações existentes
+    if materia_id:
         materia = get_materia(materia_id)
         if materia:
             nome_materia_input.value = materia[1]
@@ -58,12 +62,13 @@ def MateriasView(page: ft.Page, materia_id=None):
                 notas_list.controls.append(
                     ft.Container(
                         content=ft.Text(f"Nota: {nota}, Peso: {peso}", color="#676767", weight=ft.FontWeight.W_500),
-                        bgcolor="#EBEBEB",  # Cor de fundo para cada nota e peso
+                        bgcolor="#EBEBEB",  
                         border_radius=10,
                         padding=10,
                     )
                 )
 
+    # Função para adicionar uma nota à lista
     def add_nota_view(e):
         try:
             nota = float(nota_input.value)
@@ -73,7 +78,7 @@ def MateriasView(page: ft.Page, materia_id=None):
                 notas_list.controls.append(
                     ft.Container(
                         content=ft.Text(f"Nota: {nota}, Peso: {peso}", color="#676767", weight=ft.FontWeight.W_500),
-                        bgcolor="#EBEBEB",  # Cor de fundo para cada nota e peso
+                        bgcolor="#EBEBEB",  
                         border_radius=10,
                         padding=10
                     )
@@ -84,6 +89,7 @@ def MateriasView(page: ft.Page, materia_id=None):
         except ValueError:
             pass
 
+    # Função para calcular a média ponderada das notas
     def calcular_media():
         if not notas:
             return 0.0
@@ -91,6 +97,7 @@ def MateriasView(page: ft.Page, materia_id=None):
         soma_pesos = sum(peso for _, peso in notas)
         return soma_ponderada if soma_pesos != 0 else 0.0
 
+    # Função para salvar a matéria (adicionar ou atualizar)
     def salvar_materia(e):
         nome = nome_materia_input.value
         media_minima = float(media_input.value)
@@ -107,13 +114,15 @@ def MateriasView(page: ft.Page, materia_id=None):
                 add_nota(add_materia_id, nota, peso)
         page.go("/home")
 
+    # Função para calcular a nota necessária para atingir a média mínima
     def calcular_nota_necessaria(media_minima, soma_pesos, soma_ponderada):
-        peso_restante = 1 - soma_pesos  # Considera que a soma dos pesos é no máximo 1
+        peso_restante = 1 - soma_pesos  
         if peso_restante <= 0:
-            return 0.0  # Caso todos os pesos já tenham sido usados
+            return 0.0  
         nota_necessaria = (media_minima * (soma_pesos + peso_restante) - soma_ponderada) / peso_restante
         return max(0.0, nota_necessaria)
 
+    # Layout da tela de cadastro/edição de matéria
     return ft.View(
         f"/materias/{materia_id}" if materia_id else "/materias",
         [
@@ -121,20 +130,19 @@ def MateriasView(page: ft.Page, materia_id=None):
                 width=page.window.width,
                 height=page.window.height,
                 bgcolor="#FFFFFF", 
-                content=ft.Stack(  # Usando Stack para sobrepor o conteúdo
+                content=ft.Stack(
                     controls=[
-                        # Meio círculo no fundo
                         ft.Container(
                             width=page.window.width,
-                            height=page.window.height * 0.5,  # Proporcional ao tamanho da página
-                            bgcolor="#D7BDE2",  # Cor lilás clara
+                            height=page.window.height * 0.5,  
+                            bgcolor="#D7BDE2",  
                             gradient=ft.LinearGradient(
                                 colors=["#885D9A", "#4B83A7"],
                                 begin=ft.Alignment(-1, -1),
                                 end=ft.Alignment(1, 1)
                             ),
-                            border_radius=ft.BorderRadius(0, 0, 100, 100),  # Meio círculo
-                            alignment=ft.Alignment(-1, -1),  # Alinha ao topo
+                            border_radius=ft.BorderRadius(0, 0, 100, 100),  
+                            alignment=ft.Alignment(-1, -1),
                         ),
                         ft.Container(
                             content=ft.Column(
@@ -142,9 +150,9 @@ def MateriasView(page: ft.Page, materia_id=None):
                                     ft.Text(
                                         "Nova Matéria",
                                         style=ft.TextStyle(
-                                            size=30,  # Ajuste o tamanho conforme necessário
-                                            weight=ft.FontWeight.W_300,  # Ajuste o peso da fonte
-                                            color=ft.colors.WHITE  # Ajuste a cor conforme necessário
+                                            size=30,  
+                                            weight=ft.FontWeight.W_300,  
+                                            color=ft.colors.WHITE  
                                         )
                                     ),
                                     ft.Container(
@@ -158,7 +166,7 @@ def MateriasView(page: ft.Page, materia_id=None):
                                                             content=nota_input,
                                                             width=90,
                                                             height=40,  
-                                                            margin=ft.Margin(left=0, top=0, right=10, bottom=0)  # Ajusta a margem
+                                                            margin=ft.Margin(left=0, top=0, right=10, bottom=0)
                                                         ),
                                                         ft.Container(
                                                             content=peso_input,
@@ -177,7 +185,7 @@ def MateriasView(page: ft.Page, materia_id=None):
                                                     alignment=ft.MainAxisAlignment.START,
                                                     spacing=10
                                                 ),
-                                                notas_container,  # Container das notas
+                                                notas_container,  # Container para exibir notas
                                                 ft.Container(
                                                     content=ft.Row(
                                                         controls=[
@@ -199,8 +207,8 @@ def MateriasView(page: ft.Page, materia_id=None):
                                         ),
                                         padding=20,
                                         border_radius=12,
-                                        width=page.window.width * 0.9,  # Ajuste a largura conforme necessário
-                                        height=page.window.height * 0.8  # Ajusta a altura para o restante da tela
+                                        width=page.window.width * 0.9,  
+                                        height=page.window.height * 0.8 
                                     )
                                 ],
                                 alignment=ft.MainAxisAlignment.START,
@@ -222,7 +230,7 @@ def MateriasView(page: ft.Page, materia_id=None):
                     ],
                     alignment=ft.MainAxisAlignment.SPACE_AROUND
                 ),
-                bgcolor="#dec5f0",  # Cor roxa com opacidade
+                bgcolor="#dec5f0", 
                 padding=10,
             )
         ]

@@ -3,13 +3,15 @@ import flet as ft
 from database import add_evento, get_eventos_by_data, get_all_eventos, delete_evento, update_evento
 
 def CalendarioView(page: ft.Page):
+    # Função para atualizar a lista de próximos eventos
     def update_proximos_eventos():
-        proximos_eventos_list.controls.clear()
+        proximos_eventos_list.controls.clear()  # Limpa a lista de eventos
         for date, eventos_data in sorted(eventos.items(), reverse=True):
             for evento in eventos_data:
-                proximos_eventos_list.controls.append(create_event_row(date, evento))
-        page.update()
+                proximos_eventos_list.controls.append(create_event_row(date, evento))  # Adiciona evento à lista
+        page.update()  # Atualiza a página
 
+    # Função para criar uma linha de evento
     def create_event_row(date, event):
         return ft.Container(
             content=ft.Row(
@@ -37,15 +39,16 @@ def CalendarioView(page: ft.Page):
             border_radius=6
         )
 
+    # Função para confirmar a exclusão de um evento
     def confirm_delete_event(date, event):
         def delete_event(e):
             evento_id = next((id for id, desc in get_eventos_by_data(date) if desc == event), None)
             if evento_id:
-                delete_evento(evento_id)
-                eventos[date].remove(event)
+                delete_evento(evento_id)  # Exclui o evento do banco de dados
+                eventos[date].remove(event)  # Remove o evento da lista local
                 if not eventos[date]:
-                    del eventos[date]
-                update_proximos_eventos()
+                    del eventos[date]  # Remove a data se não houver mais eventos
+                update_proximos_eventos()  # Atualiza a lista de eventos
             page.dialog.open = False
             page.update()
 
@@ -55,7 +58,7 @@ def CalendarioView(page: ft.Page):
 
         page.dialog = ft.AlertDialog(
             title=ft.Text("Confirmar Exclusão", color="#45287a", weight=ft.FontWeight.BOLD),
-            content=ft.Text(f"Tem certeza que deseja excluir o evento'{event}'?", color="#45287a"),
+            content=ft.Text(f"Tem certeza que deseja excluir o evento '{event}'?", color="#45287a"),
             actions=[
                 ft.TextButton("Cancelar", on_click=lambda e: close_dialog()),
                 ft.TextButton("Excluir", on_click=delete_event)
@@ -64,6 +67,7 @@ def CalendarioView(page: ft.Page):
         )
         page.update()
 
+    # Função para editar um evento
     def edit_event(date, event):
         event_edit_input.value = event
         event_edit_date_picker.value = datetime.datetime.strptime(date, '%Y-%m-%d').date()
@@ -81,45 +85,50 @@ def CalendarioView(page: ft.Page):
         )
         page.update()
 
+    # Função para salvar um evento editado
     def save_event(old_date, old_event):
         new_event = event_edit_input.value
         new_date = event_edit_date_picker.value.strftime('%Y-%m-%d')
         evento_id = next((id for id, desc in get_eventos_by_data(old_date) if desc == old_event), None)
         if evento_id:
-            update_evento(evento_id, new_date, new_event)
+            update_evento(evento_id, new_date, new_event)  # Atualiza o evento no banco de dados
             if new_date != old_date:
-                eventos[old_date].remove(old_event)
+                eventos[old_date].remove(old_event)  # Remove o evento da data antiga
                 if not eventos[old_date]:
-                    del eventos[old_date]
+                    del eventos[old_date]  # Remove a data se não houver mais eventos
                 if new_date not in eventos:
                     eventos[new_date] = []
-                eventos[new_date].append(new_event)
+                eventos[new_date].append(new_event)  # Adiciona o evento à nova data
             else:
                 index = eventos[old_date].index(old_event)
-                eventos[old_date][index] = new_event
-            update_proximos_eventos()
+                eventos[old_date][index] = new_event  # Atualiza o evento na mesma data
+            update_proximos_eventos()  # Atualiza a lista de eventos
             close_dialog()
 
+    # Função para fechar o diálogo
     def close_dialog():
         page.dialog.open = False
         page.update()
 
+    # Função para lidar com a mudança de data no DatePicker
     def handle_change(e):
         nonlocal selected_date
         selected_date = e.control.value.strftime('%Y-%m-%d')
         selected_date_label.value = f"Data Selecionada: {selected_date}"
-        update_proximos_eventos()
+        update_proximos_eventos()  # Atualiza a lista de eventos para a nova data selecionada
         page.update()
 
+    # Função para lidar com o fechamento do DatePicker
     def handle_dismissal(e):
         page.add(ft.Text("DatePicker dismissed"))
 
+    # Campos de entrada e widgets
     evento_input = ft.TextField(
         label="Adicionar Evento",
         bgcolor="#FFFFFF"
     )
     proximos_eventos_list = ft.ListView(controls=[], spacing=10, expand=True)
-    eventos = {}
+    eventos = {}  # Dicionário para armazenar eventos por data
     selected_date = None
     event_edit_input = ft.TextField(
         label="Editar Evento",
@@ -131,28 +140,30 @@ def CalendarioView(page: ft.Page):
     )
     selected_date_label = ft.Text("", color="#FFFFFF", weight=ft.FontWeight.BOLD)
 
+    # Função para adicionar um novo evento
     def add_evento_handler(e):
         if not selected_date:
             page.add(ft.Text("Por favor, selecione uma data."))
             return
         evento = evento_input.value
         if evento:
-            add_evento(selected_date, evento)
+            add_evento(selected_date, evento)  # Adiciona o evento ao banco de dados
             if selected_date not in eventos:
                 eventos[selected_date] = []
-            eventos[selected_date].append(evento)
-            update_proximos_eventos()
+            eventos[selected_date].append(evento)  # Adiciona o evento à lista local
+            update_proximos_eventos()  # Atualiza a lista de eventos
             evento_input.value = ""
             page.update()
 
+    # Função para carregar eventos existentes do banco de dados
     def load_eventos():
         for data, descricao in get_all_eventos():
             if data not in eventos:
                 eventos[data] = []
-            eventos[data].append(descricao)
-        update_proximos_eventos()
+            eventos[data].append(descricao)  # Adiciona evento à lista
+        update_proximos_eventos()  # Atualiza a lista de eventos
 
-    load_eventos()
+    load_eventos()  # Carrega os eventos ao iniciar a visualização
 
     return ft.View(
         "/calendario",
@@ -163,7 +174,6 @@ def CalendarioView(page: ft.Page):
                 bgcolor="#FFFFFF",
                 content=ft.Stack(
                     controls=[
-                        # Meio círculo no fundo
                         ft.Container(
                             width=page.window.width,
                             height=page.window.height * 0.4,
@@ -176,7 +186,6 @@ def CalendarioView(page: ft.Page):
                             border_radius=ft.BorderRadius(0, 0, 100, 100),
                             alignment=ft.Alignment(-1, -1),
                         ),
-                        # Conteúdo principal
                         ft.Container(
                             content=ft.Column(
                                 controls=[
