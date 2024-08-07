@@ -19,8 +19,8 @@ def CalendarioView(page: ft.Page):
                     ft.Text(f"{date}: {event}", color="#45287a", weight=ft.FontWeight.NORMAL),
                     ft.Row(
                         controls=[
-                            ft.IconButton(icon=ft.icons.EDIT, on_click=lambda e: edit_event(date, event)),
-                            ft.IconButton(icon=ft.icons.DELETE, on_click=lambda e: confirm_delete_event(date, event))
+                            ft.IconButton(icon=ft.icons.EDIT, on_click=lambda e: edit_event(date, event), icon_color="#c29dd1"),
+                            ft.IconButton(icon=ft.icons.DELETE, on_click=lambda e: confirm_delete_event(date, event), icon_color="#c29dd1")
                         ],
                         alignment=ft.MainAxisAlignment.END
                     )
@@ -125,7 +125,11 @@ def CalendarioView(page: ft.Page):
     # Campos de entrada e widgets
     evento_input = ft.TextField(
         label="Adicionar Evento",
-        bgcolor="#FFFFFF"
+        bgcolor="#FFFFFF",
+        border_color=ft.colors.TRANSPARENT, 
+        border_radius=40,
+        label_style=ft.TextStyle(color="#8F8F8F"),
+        color="#8F8F8F"
     )
     proximos_eventos_list = ft.ListView(controls=[], spacing=10, expand=True)
     eventos = {}  # Dicionário para armazenar eventos por data
@@ -241,9 +245,9 @@ def CalendarioView(page: ft.Page):
                                                             ft.Text(
                                                                 "Próximos Eventos:",
                                                                 style=ft.TextStyle(
-                                                                    size=20,
-                                                                    weight=ft.FontWeight.W_400,
-                                                                    color="#45287a"
+                                                                    size=15,
+                                                                    weight=ft.FontWeight.W_500,
+                                                                    color="#c29dd1"
                                                                 )
                                                             ),
                                                             proximos_eventos_list
@@ -281,9 +285,9 @@ def CalendarioView(page: ft.Page):
             ft.BottomAppBar(
                 content=ft.Row(
                     controls=[
-                        ft.IconButton(icon=ft.icons.ALARM, icon_color="#5e4e69", bgcolor="#c5a4de", on_click=lambda _: page.go("/faltas")),
-                        ft.IconButton(icon=ft.icons.HOME, icon_color="#785494", bgcolor="#c5a4de", on_click=lambda _: page.go("/home")),
-                        ft.IconButton(icon=ft.icons.EVENT, icon_color="#785494", on_click=lambda _: page.go("/calendario"))
+                        ft.IconButton(icon=ft.icons.ALARM, icon_color="#785494", on_click=lambda _: page.go("/faltas")),
+                        ft.IconButton(icon=ft.icons.HOME, icon_color="#785494", on_click=lambda _: page.go("/home")),
+                        ft.IconButton(icon=ft.icons.EVENT, icon_color="#5e4e69", bgcolor="#c5a4de", on_click=lambda _: page.go("/calendario"))
                     ],
                     alignment=ft.MainAxisAlignment.SPACE_AROUND
                 ),
