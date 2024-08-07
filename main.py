@@ -13,7 +13,7 @@ def splashScreen(page: ft.Page):
 
     # Adicionar a imagem GIF
     gif_image = ft.Image(
-        src="assets/LogoNB.gif",  # Certifique-se de que o GIF está na pasta assets
+        src="assets/LogoNB.gif",
         width=400,
         height=400
     )
