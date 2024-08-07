@@ -2,14 +2,50 @@ import flet as ft
 from database import add_materia, get_materia, update_materia, get_notas_by_materia, add_nota, delete_notas_by_materia
 
 def MateriasView(page: ft.Page, materia_id=None):
-    nome_materia_input = ft.TextField(label="Nome da Matéria", bgcolor="#FFFFFF", border_color="#D7BDE2")
-    media_input = ft.TextField(label="Média Mínima", bgcolor="#FFFFFF", border_color="#D7BDE2")
-    notas_list = ft.ListView(controls=[], height=200, spacing=10)
+    nome_materia_input = ft.TextField(
+        label="Nome da Matéria", 
+        bgcolor="#FFFFFF", 
+        border_color=ft.colors.TRANSPARENT,
+        label_style=ft.TextStyle(color="#8F8F8F"),
+        color="#8F8F8F"
+    )
+    media_input = ft.TextField(
+        label="Média Mínima", 
+        bgcolor="#FFFFFF", 
+        border_color=ft.colors.TRANSPARENT,
+        label_style=ft.TextStyle(color="#8F8F8F"),
+        color="#8F8F8F"
+    )
+    notas_list = ft.ListView(
+        controls=[], 
+        spacing=10,
+    )
+
+    notas_container = ft.Container(
+        content=notas_list,
+        height=200,  # Define uma altura fixa para o container das notas
+        width=300,
+        padding=10
+    )
 
     notas = []  # Lista para armazenar as notas e seus respectivos pesos
 
-    nota_input = ft.TextField(label="Adicionar Nota", bgcolor="#FFFFFF", border_color="#D7BDE2")
-    peso_input = ft.TextField(label="Adicionar Peso", bgcolor="#FFFFFF", border_color="#D7BDE2")
+    nota_input = ft.TextField(
+        label="Nota",
+        bgcolor="#FFFFFF", 
+        border_color=ft.colors.TRANSPARENT, 
+        border_radius=40,
+        label_style=ft.TextStyle(color="#8F8F8F"),
+        color="#8F8F8F"
+    )
+    peso_input = ft.TextField(
+        label="Peso",
+        bgcolor="#FFFFFF", 
+        border_color=ft.colors.TRANSPARENT, 
+        border_radius=40,
+        label_style=ft.TextStyle(color="#8F8F8F"),
+        color="#8F8F8F"
+    )
 
     if materia_id:  # Se um ID de matéria for fornecido, preenche os campos
         materia = get_materia(materia_id)
@@ -19,7 +55,14 @@ def MateriasView(page: ft.Page, materia_id=None):
             # Carrega notas associadas à matéria
             notas = get_notas_by_materia(materia_id)
             for nota, peso in notas:
-                notas_list.controls.append(ft.Text(f"Nota: {nota}, Peso: {peso}", color="#FFFFFF", weight=ft.FontWeight.BOLD))
+                notas_list.controls.append(
+                    ft.Container(
+                        content=ft.Text(f"Nota: {nota}, Peso: {peso}", color="#676767", weight=ft.FontWeight.W_500),
+                        bgcolor="#EBEBEB",  # Cor de fundo para cada nota e peso
+                        border_radius=10,
+                        padding=10,
+                    )
+                )
 
     def add_nota_view(e):
         try:
@@ -27,7 +70,14 @@ def MateriasView(page: ft.Page, materia_id=None):
             peso = float(peso_input.value)
             if nota is not None and peso is not None:  # Permite adicionar 0
                 notas.append((nota, peso))
-                notas_list.controls.append(ft.Text(f"Nota: {nota}, Peso: {peso}", color="#45287a", weight=ft.FontWeight.BOLD))
+                notas_list.controls.append(
+                    ft.Container(
+                        content=ft.Text(f"Nota: {nota}, Peso: {peso}", color="#676767", weight=ft.FontWeight.W_500),
+                        bgcolor="#EBEBEB",  # Cor de fundo para cada nota e peso
+                        border_radius=10,
+                        padding=10
+                    )
+                )
                 nota_input.value = ""
                 peso_input.value = ""
                 page.update()
@@ -71,61 +121,97 @@ def MateriasView(page: ft.Page, materia_id=None):
                 width=page.window.width,
                 height=page.window.height,
                 bgcolor="#FFFFFF", 
-                content=ft.Column(
+                content=ft.Stack(  # Usando Stack para sobrepor o conteúdo
                     controls=[
+                        # Meio círculo no fundo
                         ft.Container(
-                            content=ft.Column(
-                                controls=[
-                                    nome_materia_input,
-                                    media_input,
-                                    ft.Row(
-                                        controls=[
-                                            ft.Container(
-                                                content=nota_input,
-                                                width=150,  # Ajusta a largura do campo
-                                                margin=ft.Margin(left=0, top=0, right=10, bottom=0)  # Ajusta a margem
-                                            ),
-                                            ft.Container(
-                                                content=peso_input,
-                                                width=150  # Ajusta a largura do campo
-                                            ),
-                                            ft.IconButton(
-                                                icon=ft.icons.ADD, 
-                                                on_click=add_nota_view,
-                                                bgcolor="#D7BDE2",
-                                                width=50,
-                                                height=50
-                                            )
-                                        ],
-                                        alignment=ft.MainAxisAlignment.START,
-                                        spacing=10
-                                    ),
-                                    ft.ElevatedButton("Salvar Matéria", on_click=salvar_materia, bgcolor="#D7BDE2"),
-                                    notas_list,
-                                ],
-                                alignment=ft.MainAxisAlignment.START,
-                                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                                spacing=20,
-                                expand=True
-                            ),
-                            padding=20,
+                            width=page.window.width,
+                            height=page.window.height * 0.5,  # Proporcional ao tamanho da página
                             bgcolor="#D7BDE2",  # Cor lilás clara
                             gradient=ft.LinearGradient(
                                 colors=["#885D9A", "#4B83A7"],
                                 begin=ft.Alignment(-1, -1),
                                 end=ft.Alignment(1, 1)
                             ),
-                            border_radius=12,
-                            width=page.window.width,
-                            height=page.window.height * 0.8  # Ajusta a altura para o restante da tela
-                        )
-                    ],
-                    alignment=ft.MainAxisAlignment.START,
-                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    spacing=20,
-                    expand=True
-                ),
-                padding=20
+                            border_radius=ft.BorderRadius(0, 0, 100, 100),  # Meio círculo
+                            alignment=ft.Alignment(-1, -1),  # Alinha ao topo
+                        ),
+                        ft.Container(
+                            content=ft.Column(
+                                controls=[
+                                    ft.Text(
+                                        "Nova Matéria",
+                                        style=ft.TextStyle(
+                                            size=30,  # Ajuste o tamanho conforme necessário
+                                            weight=ft.FontWeight.W_300,  # Ajuste o peso da fonte
+                                            color=ft.colors.WHITE  # Ajuste a cor conforme necessário
+                                        )
+                                    ),
+                                    ft.Container(
+                                        content=ft.Column(
+                                            controls=[
+                                                nome_materia_input,
+                                                media_input,
+                                                ft.Row(
+                                                    controls=[
+                                                        ft.Container(
+                                                            content=nota_input,
+                                                            width=90,
+                                                            height=40,  
+                                                            margin=ft.Margin(left=0, top=0, right=10, bottom=0)  # Ajusta a margem
+                                                        ),
+                                                        ft.Container(
+                                                            content=peso_input,
+                                                            width=90,
+                                                            height=40
+                                                        ),
+                                                        ft.IconButton(
+                                                            icon=ft.icons.ADD, 
+                                                            on_click=add_nota_view,
+                                                            bgcolor="#7090C4",
+                                                            width=40,
+                                                            height=40,
+                                                            icon_color="#FFFFFF"
+                                                        )
+                                                    ],
+                                                    alignment=ft.MainAxisAlignment.START,
+                                                    spacing=10
+                                                ),
+                                                notas_container,  # Container das notas
+                                                ft.Container(
+                                                    content=ft.Row(
+                                                        controls=[
+                                                            ft.IconButton(
+                                                                icon=ft.icons.CHECK, 
+                                                                on_click=salvar_materia, 
+                                                                bgcolor="#9CCFAB",
+                                                                icon_color="#FFFFFF"
+                                                            ),
+                                                        ],
+                                                        alignment=ft.MainAxisAlignment.END
+                                                    )
+                                                ),
+                                            ],
+                                            alignment=ft.MainAxisAlignment.START,
+                                            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                            spacing=20,
+                                            expand=True
+                                        ),
+                                        padding=20,
+                                        border_radius=12,
+                                        width=page.window.width * 0.9,  # Ajuste a largura conforme necessário
+                                        height=page.window.height * 0.8  # Ajusta a altura para o restante da tela
+                                    )
+                                ],
+                                alignment=ft.MainAxisAlignment.START,
+                                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                spacing=20,
+                                expand=True
+                            ),
+                            padding=20
+                        ),
+                    ]
+                )
             ),
             ft.BottomAppBar(
                 content=ft.Row(
