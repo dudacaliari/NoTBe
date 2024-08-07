@@ -55,7 +55,7 @@ def CalendarioView(page: ft.Page):
 
         page.dialog = ft.AlertDialog(
             title=ft.Text("Confirmar Exclusão", color="#45287a", weight=ft.FontWeight.BOLD),
-            content=ft.Text(f"Tem certeza que deseja excluir o evento '{event}'?", color="#45287a"),
+            content=ft.Text(f"Tem certeza que deseja excluir o evento'{event}'?", color="#45287a"),
             actions=[
                 ft.TextButton("Cancelar", on_click=lambda e: close_dialog()),
                 ft.TextButton("Excluir", on_click=delete_event)
